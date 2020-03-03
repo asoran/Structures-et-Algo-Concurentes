@@ -29,6 +29,8 @@ hs_err_pid*
 .classpath
 .project
 .settings/
+.metadata/
+.recommenders/
 
 # Maven target
 target/
