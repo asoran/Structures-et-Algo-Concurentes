@@ -1,0 +1,66 @@
+Altan SORAN
+Compte rendu des questions
+https://github.com/asoran/Structures-et-Algo-Concurentes
+
+TD1: Volatile, Opérations atomiques et CompareAndSet
+
+Exercice 1 - A vos chronomètres
+
+1)
+Il lance une boucle (stop) dans un autre thread, et essaie de l'arrêter après 100ms.
+
+2)
+Non, bug boucle infinie =(
+La variable stop est copié dans une mémoire locale (registre), et ne lit plus la valeur dans la RAM.
+
+3)
+synchronized !
+67998482
+58915217
+62060009
+61746104
+Moyenne: 63 000 000
+
+4)
+Voir code.
+Implémentation lock-free.
+
+Exercice 2 - Compteur
+
+1)
+Si 2 threads appellent nextInt sur la meme Counter, la variable peut changer de valeur entre l'incrémentation et la valeur retourner sera mauvaise ?
+
+2)
+Avec volatile on force les écritures/lectures en mémoire principales, mais ça ne règle pas le problème que il peut y avoir du temps qui se passe entre l'addition et le stockage de la variable, donc le compteur dans un thread peut stocké une ancienne valeur.
+
+3)
+compareAndSet(expectedValue, newValue)
+Met à la valeur à l'intérieur de la variable si la valeur actuelle est expectedValue.
+La valeur de retour est true si l'écriture à réussie, false sinon (donc expectedValue était different de la valeur)
+(Cette instruction peut être utile au cas où le processeur n'as pas l'instruction lradd, avec compareAndSet on peut émuler toutes les opérations atomiques)
+
+4)
+getAndIncrement()
+Retourne l'ancienne valeur et incrément la variable de façon atomique, c'est à dire que on peut pas être coupé au milieu de l'opération donc sécurisé dans le context de plusieurs threads.
+
+5)
+lock-free veut dire qu'on utilise pas sont des algorithmes qui n'ont ni blocs synchronized, ni lock.
+Oui les implantations Counter et Counter2 sont lock-free.
+
+Exercice 3 - Liste chainée lock-free
+
+1)
+Problème de concurrence sur addFirst et la variable Head
+(dans size aussi lol)
+
+2)
+Voir code.
+
+3)
+Je pense que avec le while true on essaie trop de fois ?
+
+4)
+Voir code :D
+
+
+--------- Fin
