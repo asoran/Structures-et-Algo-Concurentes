@@ -1,12 +1,11 @@
-package exo3;
+package lab1.exo3;
 
 import static java.util.Objects.requireNonNull;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class Linked2<E> {
+public class Linked<E> {
 	private static class Entry<E> {
 		@SuppressWarnings("unused") // mouais
 		private final E element;
@@ -18,26 +17,14 @@ public class Linked2<E> {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private volatile Entry<E> entry;
-	private final static VarHandle handler;
-
-	static {
-		try {
-			handler = MethodHandles.lookup()
-				.findVarHandle(Linked2.class, "entry", Entry.class);
-
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new AssertionError("=(");
-		}
-	}
+	private AtomicReference<Entry<E>> head = new AtomicReference<Entry<E>>();
 
 	public void addFirst(E element) {
 		requireNonNull(element);
 
 		while(true) {
-			var current = (Entry<E>) handler.getVolatile(this);
-			if(handler.compareAndSet(this, current, new Entry<E>(element, current))) {
+			var current = head.get();
+			if(head.compareAndSet(current, new Entry<E>(element, current))) {
 				return;
 			}
 		}
@@ -45,7 +32,7 @@ public class Linked2<E> {
 
 	public int size() {
 		var size = 0;
-		for (var link = (Entry<E>) handler.getVolatile(this); link != null; link = link.next) {
+		for (var link = head.get(); link != null; link = link.next) {
 			size++;
 		}
 		return size;
@@ -55,7 +42,7 @@ public class Linked2<E> {
 	public static void main(String[] args) throws InterruptedException {
 		final int TEST_NUMBER = 100_000;
 		final int NB_OF_THREADS = 2;
-		var list = new Linked2<String>();
+		var list = new Linked<String>();
 
 		var threads = new ArrayList<Thread>();
 		for(var i = 0; i < NB_OF_THREADS; ++i) {
@@ -70,6 +57,6 @@ public class Linked2<E> {
 		for(var thread : threads)
 			thread.join();
 
-		System.out.println("[Size should be " + (TEST_NUMBER * NB_OF_THREADS) + ", and it is : " + list.size());
-	}	
+		System.out.println("Size should be " + (TEST_NUMBER * NB_OF_THREADS) + ", but is : " + list.size());
+	}
 }

@@ -1,4 +1,4 @@
-package exo1;
+package lab1.exo1;
 
 public class BogusVolatile {
 	private volatile boolean stop;
