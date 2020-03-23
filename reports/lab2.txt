@@ -1,0 +1,50 @@
+Altan SORAN
+Compte rendu des questions
+https://github.com/asoran/Structures-et-Algo-Concurentes
+
+TD2: Modèle de mémoire, publication et Opérations atomiques 
+
+- Exercice 1 - Publication safe
+
+1)
+Le Problème de publication arrive quand on essaye d'accéder aux champs
+d'un objet avant qu'il ai finit d'initialiser. Quand on appelle le constructeur d'un objet,
+la création de l'objet et l'initialisation de ses champs se font de façon séparés et non atomiques.
+Donc si un autre thread essaie d'accéder aux champs de l'objet, il se peut que le thread voit
+la valeur par défaut et pas la valeur à laquelle il s'attend.
+
+2)
+Un thread peut essayer de faire getValue() avant que le champ value soit initialisé.
+
+public static void main() { 	var f = new Foo("lol");
+	new Thread(() -> { 		System.out.println(f.getValue()); 	}).start();
+}
+
+3)
+Oui car pour la même raison que 2) pour le champs name.
+Le champ age est final donc c'est bon pour lui
+Pour régler le problème on peut mettre name en final
+ 4)
+Non car volatile garantie l'écriture en ram de ce qu'il y a avant lui, donc de name aussi.
+
+5)
+On lance un thread dans le constructeur, on est pas sur que this est initialisé =(
+On corrige le problème en sortant la lancé du thread =)
+
+6)
+Non, car c'est la paramètres qui sont utilisées.
+Il marche mais c'est pas bien d'écrire ce code ...
+
+- Exercice 2 - Liste chainée avec ajout en fin
+
+1)
+On a plus besoin de modifier le code de size car j'ai déclarer next en volatile.
+
+- Exercice 3 - Set 'Copy on Write'
+
+1)
+Comme d'habitude, dans un contexte multi-thread il peut se passer
+beaucoup de change entre le get et le set ...
+
+
+--------- Fin
