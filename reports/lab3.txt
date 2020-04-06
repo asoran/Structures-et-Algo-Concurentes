@@ -1,0 +1,55 @@
+Altan SORAN
+Compte rendu des questions
+https://github.com/asoran/Structures-et-Algo-Concurentes
+
+TD3: Memory Model, Publication et Lock
+
+Exercice 1 - SpinLock pas réentrant
+
+1)
+Appel recursif
+
+2)
+On veut incrémenter un compteur 1 000 000 de fois, 2 fois (donc avoir 2 000 000 a la fin)
+Meme si le compteur est volatile, le ++ n'est pas atomique
+
+3)
+Si on arrive pas à acquérir le lock, on attend. Le problème c'est que c'est de l'attente active.
+Thread.onSpinWait permet au dire au CPU qu'on fait une boucle qui attend quelque
+chose pour que le CPU fasse des optimisations.
+
+4) 
+Code
+
+5)
+Pour tryLock, si on arrive pas à acquérir le lock, au lieu d'attendre on quitte la fonction en
+renvoyant false
+
+Exercice 2 - SpinLock Réentrant
+
+Code
+
+Exercice 3 - Double-Checked Locking
+
+1, 2)
+Non pas thread-safe, il y a de la concurrence: plusieurs threads peuvent exécutés
+Path.of en même temps.
+
+3)
+Problème de publication: On peut retourner un objet Path pas initialisé !
+On peut rendre le champ volatile.
+
+4)
+setRelease garantie que le champ sera assigné uniquement quand l'objet aura
+complètement finit d'initialisé, getAcquire garantie que l'objet récupéré aura finit
+d'être d'initialisé.
+ça ne garantie pas l'écriture en mémoire principale contrairement a volatile, mais
+ici ça nous suffit car le champ est static ?
+
+5)
+Il n'y a pas de mécanique de synchronized, ni de coup de variable volatile.
+On utilise juste les garanties de bases de Java que la classe ne sera chargé que à
+son premier appel et que 1 seul thread peut accéder au bloc static !
+
+
+--------- Fin :)
