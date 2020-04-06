@@ -7,7 +7,7 @@ TD3: Memory Model, Publication et Lock
 Exercice 1 - SpinLock pas réentrant
 
 1)
-Appel recursif
+Re-appeler une méthode qui est déjà dans notre class stack
 
 2)
 On veut incrémenter un compteur 1 000 000 de fois, 2 fois (donc avoir 2 000 000 a la fin)
