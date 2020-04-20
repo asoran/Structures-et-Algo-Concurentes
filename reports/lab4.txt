@@ -1,0 +1,51 @@
+Altan SORAN
+Compte rendu des questions
+https://github.com/asoran/Structures-et-Algo-Concurentes
+
+TD4: Fork/Join 
+
+Exercice 1 - Rappel sur les fonctions d'ordre supérieur
+
+1)
+public static int reduce(int[] arr, int initial, IntBinaryOperator op);
+
+2, 3)
+Code
+
+Exercice 2 - Grosse réduction
+
+1, 2)
+Code
+
+3)
+a)
+Si on fait un appel bloquant dans un thread pool normal on peut avoir un deadlock,
+alors que ForkJoinPool gère ce cas.
+
+b)
+ForkJoinPool.commonPool();
+
+c)
+Avec invoke !
+
+d, e)
+Code
+
+Exercice 3 - ForkJoinCollections
+
+1)
+public static <T, V> V forkJoinReduce(Collection<T> collection, int threshold, V initialValue,
+	BiFunction<T, V, V> accumulator, BinaryOperator<V> combiner);
+
+On a besoin d'une fonction accumulator va pouvoir stocké (accumulé) les données de notre collection
+Vu que l'opération va être distribué, il se peut qu'on se retrouve avec plusieurs accumulateurs, ils faut
+donc savoir comment combiné 2 accumulateurs pour n'en former plus q'un :)
+
+2)
+Code
+
+3)
+Je sais pas trop quoi en conclure :c
+
+
+--------- Fin :)

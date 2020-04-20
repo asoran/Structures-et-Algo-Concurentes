@@ -35,10 +35,6 @@ public class Reducer {
 		return Arrays.stream(arr).parallel().reduce(initial, op);
 	}
 
-	public static int lol() {
-		return 4;
-	}
-
 	private static class ReducingTask extends RecursiveTask<Integer> {
 		final int[] arr;
 		final int initial, from, toEx;

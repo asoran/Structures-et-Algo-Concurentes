@@ -13,28 +13,27 @@ public class ForkJoinCollections {
 	public static <T, V> V forkJoinReduce(Collection<T> collection, int threshold, V initialValue,
 			BiFunction<T, V, V> accumulator, BinaryOperator<V> combiner) {
 
-		return forkJoinReduce(collection.spliterator(), threshold, initialValue, accumulator, combiner);
+		return forkJoinReduce(collection.spliterator(), collection.size(), threshold, initialValue, accumulator,
+				combiner);
 	}
 
-	public static <T, V> V computeSeq(Spliterator<T> split, V initialValue, BiFunction<T, V, V> acc) {
-		final var holder = new Object() {
-			private V value = initialValue;
-		};
-		for (;;)
-			if (!split.tryAdvance(t -> holder.value = acc.apply(t, holder.value)))
-				break;
-		return holder.value;
+	private static <V, T> V forkJoinReduce(Spliterator<T> spliterator, int size, int threshold, V initialValue,
+			BiFunction<T, V, V> accumulator, BinaryOperator<V> combiner) {
+
+		var pool = ForkJoinPool.commonPool();
+		return pool.invoke(new ReducingTask<>(spliterator, size, threshold, initialValue, accumulator, combiner));
 	}
 
-	@SuppressWarnings("serial") // ?????????????
+	@SuppressWarnings("serial")
 	private static class ReducingTask<T, V> extends RecursiveTask<V> {
-		final Spliterator<T> split;
-		final int threshold;
-		final V initialValue;
-		final BiFunction<T, V, V> acc;
-		final BinaryOperator<V> comb;
+		private final Spliterator<T> split;
+		private final int threshold;
+		private final V initialValue;
+		private final BiFunction<T, V, V> acc;
+		private final BinaryOperator<V> comb;
+		private final long size; // Approximative size, not exact
 
-		public ReducingTask(Spliterator<T> split, int threshold, V initialValue, BiFunction<T, V, V> acc,
+		public ReducingTask(Spliterator<T> split, long size, int threshold, V initialValue, BiFunction<T, V, V> acc,
 				BinaryOperator<V> comb) {
 			super();
 			this.split = split;
@@ -42,13 +41,14 @@ public class ForkJoinCollections {
 			this.initialValue = initialValue;
 			this.acc = acc;
 			this.comb = comb;
+			this.size = size;
 		}
 
 		@Override
 		protected V compute() {
 			var s = split.estimateSize();
 			if (s == Long.MAX_VALUE) {
-				throw new AssertionError("Je sais pas quoi faire");
+				s = size;
 			}
 
 			if (s < threshold) {
@@ -56,27 +56,35 @@ public class ForkJoinCollections {
 			}
 
 			var s2 = split.trySplit();
-			if (s2 == null)
-				throw new IllegalArgumentException("Spliterator cannot split"); // Change this exception ?
-			var f2 = new ReducingTask<T, V>(s2, threshold, initialValue, acc, comb);
+			if (s2 == null) {
+				// If it can't split, do it normally
+				return computeSeq(s2, initialValue, acc);
+			}
+
+			var f2 = new ReducingTask<>(s2, s / 2, threshold, initialValue, acc, comb);
 			f2.fork();
 
 			return comb.apply(computeSeq(split, initialValue, acc), f2.join());
 		}
 	}
 
-	private static <V, T> V forkJoinReduce(Spliterator<T> spliterator, int threshold, V initialValue,
-			BiFunction<T, V, V> accumulator, BinaryOperator<V> combiner) {
-
-		var pool = ForkJoinPool.commonPool();
-		return pool.invoke(new ReducingTask<T, V>(spliterator, threshold, initialValue, accumulator, combiner));
+	private static <T, V> V computeSeq(Spliterator<T> split, V initialValue, BiFunction<T, V, V> acc) {
+		var holder = new Object() {
+			private V value = initialValue;
+		};
+		for (;;) {
+			if (!split.tryAdvance(t -> holder.value = acc.apply(t, holder.value))) {
+				break;
+			}
+		}
+		return holder.value;
 	}
 
 	public static void main(String[] args) {
-		// sequential
+		// sequential ; takes about 90ms on my pc
 		System.out.println(IntStream.range(0, 10_000).sum());
 
-		// fork/join
+		// fork/join ; takes about 120ms on my pc
 		var list = IntStream.range(0, 10_000).boxed().collect(Collectors.toList());
 		var result = forkJoinReduce(list, 1_000, 0, (acc, value) -> acc + value, (acc1, acc2) -> acc1 + acc2);
 		System.out.println(result);
