@@ -1,0 +1,42 @@
+Altan SORAN
+Compte rendu des questions
+https://github.com/asoran/Structures-et-Algo-Concurentes
+
+TD5: Single instruction, Multiple Data (SIMD) 
+Calcul Parallèle, Vectorisation, Loop decomposition 
+
+Exercice 1 - Startup
+Works just fine :ok_hand: (osx 10.12)
+
+Exercice 2 - Vectorized Add
+1)
+Ok
+
+2)
+Pour Fork/Join et l'api Vector:
+Les 2 permettent de traiter des tâches plus vite mais:
+F/J permet de faire des opérations en les répartissants sur plusieurs coeurs
+Vector permet de convertir plusieurs opérations mathématique en 1 seul opération
+
+Par contre je voit pas le rapport avec volatiles/CaS :/
+
+3, 4, 5, 6)
+Code
+
+Exercice 3 - Vectorized Sub
+
+1)
+La méthode reduce n'est pas disponible pour l'opération (-), car c'est une opération
+binaire et pas associative pour le processeur (le processeur peut faire plusieurs additions
+en 1 seule fois, mais pas de soustraction).
+
+2, 3)
+Code
+
+Exercice 4 - MinMax
+
+1, 2, 3)
+Code
+
+
+--------- Fin :)
