@@ -22,7 +22,8 @@ public class VectorizedTest {
 	private static Stream<Arguments> provideIntsArraySub() {
 		return IntStream.of(0, 1, 10, 100, 1000, 10_000, 100_000)
 				.mapToObj(i -> new Random(0).ints(i, 0, 1000).toArray())
-				.map(array -> Arguments.of(array, Arrays.stream(array).reduce(0, Integer::sum) * -1));
+				.map(array -> Arguments.of(array, Arrays.stream(array).reduce(0, (a, b) -> a - b)));
+		//or	.map(array -> Arguments.of(array, Arrays.stream(array).reduce(0, Integer::sum) * -1));
 	}
 
 	private static Stream<Arguments> provideIntsArrayMinMax() {
